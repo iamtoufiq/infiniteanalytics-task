@@ -221,12 +221,18 @@ body {
 }
 
 .filter-label select {
-  padding: 8px;
+  padding: 8px 12px;
   border: 1px solid #e2e8f0;
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
   background-color: #fff;
+  transition: border-color 0.2s;
+}
+
+.filter-label select:focus {
+  border-color: #2b6cb0;
+  outline: none;
 }
 
 .date-range {
@@ -243,12 +249,20 @@ body {
   color: #4a5568;
 }
 
-.date-range input {
-  padding: 8px;
+.date-picker {
+  padding: 8px 12px;
   border: 1px solid #e2e8f0;
   border-radius: 5px;
   font-size: 1rem;
   background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.date-picker:focus {
+  border-color: #2b6cb0;
+  box-shadow: 0 0 5px rgba(43, 108, 176, 0.3);
+  outline: none;
 }
 
 .no-invoices {
@@ -260,6 +274,7 @@ body {
 .invoices-container {
   display: grid;
   gap: 15px;
+  grid-template-columns: 1fr; /* Default: 1 column */
 }
 
 /* Invoice Card */
@@ -313,8 +328,15 @@ body {
   color: #4a5568;
 }
 
-.status-select {
+.invoice-actions {
   margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-select {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -327,6 +349,40 @@ body {
   font-size: 1rem;
   cursor: pointer;
   background-color: #fff;
+  transition: border-color 0.2s;
+}
+
+.status-select select:focus {
+  border-color: #2b6cb0;
+  outline: none;
+}
+
+.download-btn, .email-btn {
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #718096;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.download-btn:hover {
+  background: #5a6779;
+}
+
+.email-btn {
+  background: #2b6cb0;
+}
+
+.email-btn:hover {
+  background: #2c5282;
 }
 
 /* Modal Styles */
@@ -358,9 +414,11 @@ body {
 .modal-close-btn {
   position: absolute;
   top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
   right: 10px;
-  background: #e53e3e;
-  color: #fff;
   border: none;
   border-radius: 50%;
   width: 30px;
@@ -371,17 +429,19 @@ body {
 }
 
 .modal-close-btn:hover {
-  background: #c53030;
+opacity: 0.8;
 }
 
 /* Responsive Design */
-@media (min-width: 768px) {
-  .app-container {
-    flex-direction: row;
+@media (min-width: 992px) {
+  .invoices-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for lg and up */
   }
-  
-  .invoice-list-section {
-    flex: 1;
+}
+
+@media (max-width: 991px) {
+  .invoices-container {
+    grid-template-columns: 1fr; /* 1 column for less than lg */
   }
 }
 
@@ -411,7 +471,7 @@ body {
     width: 100%;
   }
   
-  .date-range input {
+  .date-picker {
     width: 100%;
   }
   
@@ -419,6 +479,11 @@ body {
     flex-direction: column;
     gap: 10px;
     text-align: center;
+  }
+  
+  .invoice-actions {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
   .status-select {

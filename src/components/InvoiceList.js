@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import invoiceStore from '../stores/InvoiceStore';
 import { InvoiceActions } from '../actions/InvoiceActions';
+import jsPDF from 'jspdf'; // Import jsPDF
+import { RiChatDownloadFill, RiMailFill  } from "react-icons/ri";
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState(invoiceStore.getAllInvoices());
@@ -28,6 +30,65 @@ const InvoiceList = () => {
 
   const handleStatusChange = (id) => (e) => {
     InvoiceActions.updateInvoiceStatus(id, e.target.value);
+  };
+
+  const handleDownload = (id) => {
+    const invoice = invoices.find(inv => inv.id === id);
+    if (!invoice) return;
+
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(18);
+    doc.setTextColor(43, 108, 176); // Blue from the app's color scheme
+    doc.text(`Invoice #${invoice.id}`, 20, 20);
+
+    // Details
+    doc.setFontSize(12);
+    doc.setTextColor(45, 55, 72); // Dark gray from the app
+    doc.text(`Created: ${invoice.createdAt}`, 20, 35);
+    doc.text(`Due: ${invoice.dueDate}`, 20, 45);
+    doc.text(`Status: ${invoice.status}`, 20, 55);
+    doc.text(`Total: $${calculateTotal(invoice.items).toFixed(2)}`, 20, 65);
+    doc.text(`Notes: ${invoice.notes || 'N/A'}`, 20, 75);
+
+    // Line Items Header
+    doc.setFontSize(14);
+    doc.setTextColor(74, 85, 104); // Medium gray
+    doc.text('Line Items', 20, 95);
+
+    // Table Headers
+    doc.setFontSize(10);
+    doc.setTextColor(45, 55, 72);
+    doc.text('Description', 20, 105);
+    doc.text('Type', 70, 105);
+    doc.text('Rate', 100, 105);
+    doc.text('Qty', 130, 105);
+    doc.text('Total', 160, 105);
+
+    // Line Items
+    let yPos = 115;
+    invoice.items.forEach((item) => {
+      doc.text(item.description, 20, yPos);
+      doc.text(item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'N/A', 70, yPos);
+      doc.text(`$${item.rate.toFixed(2)}`, 100, yPos);
+      doc.text(`${item.quantity || item.hours}`, 130, yPos);
+      doc.text(`$${(item.rate * (item.quantity || item.hours)).toFixed(2)}`, 160, yPos);
+      yPos += 10;
+    });
+
+    // Footer Total
+    doc.setFontSize(12);
+    doc.setTextColor(45, 55, 72);
+    doc.text(`Grand Total: $${calculateTotal(invoice.items).toFixed(2)}`, 160, yPos + 10);
+
+    // Save the PDF
+    doc.save(`invoice_${invoice.id}.pdf`);
+  };
+
+  const handleSendEmail = (id) => {
+    console.log(`Sending email for Invoice #${id}`); // For toast integration
+    alert(`Email sent for Invoice #${id} (mocked)`);
   };
 
   const calculateTotal = (items) => items.reduce((sum, item) => sum + (item.rate * (item.quantity || item.hours)), 0);
@@ -59,11 +120,11 @@ const InvoiceList = () => {
           <div className="date-range">
             <label>
               Start Date:
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="date-picker" />
             </label>
             <label>
               End Date:
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="date-picker" />
             </label>
           </div>
         )}
@@ -94,14 +155,22 @@ const InvoiceList = () => {
                     ))}
                   </ul>
                 </div>
-                <label className="status-select">
-                  Status:
-                  <select value={invoice.status} onChange={handleStatusChange(invoice.id)}>
-                    <option value="outstanding">Outstanding</option>
-                    <option value="paid">Paid</option>
-                    <option value="late">Late</option>
-                  </select>
-                </label>
+                <div className="invoice-actions">
+                  <label className="status-select">
+                    Status:
+                    <select value={invoice.status} onChange={handleStatusChange(invoice.id)}>
+                      <option value="outstanding">Outstanding</option>
+                      <option value="paid">Paid</option>
+                      <option value="late">Late</option>
+                    </select>
+                  </label>
+                  <button className="download-btn" onClick={() => handleDownload(invoice.id)} title="Download PDF">
+                  <RiChatDownloadFill size={24}/>
+                  </button>
+                  <button className="email-btn" onClick={() => handleSendEmail(invoice.id)} title="Send Email">
+                 <RiMailFill size={24}/>
+                  </button>
+                </div>
               </div>
             </div>
           ))}

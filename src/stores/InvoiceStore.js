@@ -26,7 +26,6 @@ const InvoiceStore = () => {
   };
 
   store.getAllInvoices = () => [...invoices];
-
   store.getLateInvoices = () => invoices.filter(invoice => invoice.status === 'late');
   store.getPaidInvoices = () => invoices.filter(invoice => invoice.status === 'paid');
   store.getOutstandingInvoices = () => invoices.filter(invoice => invoice.status === 'outstanding');
