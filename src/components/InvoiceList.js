@@ -4,23 +4,33 @@ import { InvoiceActions } from '../actions/InvoiceActions';
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState(invoiceStore.getAllInvoices());
-  const [showLateOnly, setShowLateOnly] = useState(false);
+  const [filter, setFilter] = useState('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   useEffect(() => {
     const updateInvoices = () => {
-      const newInvoices = showLateOnly ? invoiceStore.getLateInvoices() : invoiceStore.getAllInvoices();
+      let newInvoices;
+      switch (filter) {
+        case 'paid': newInvoices = invoiceStore.getPaidInvoices(); break;
+        case 'outstanding': newInvoices = invoiceStore.getOutstandingInvoices(); break;
+        case 'late': newInvoices = invoiceStore.getLateInvoices(); break;
+        case 'date': newInvoices = invoiceStore.getInvoicesByDateRange(startDate, endDate); break;
+        case 'all':
+        default: newInvoices = invoiceStore.getAllInvoices(); break;
+      }
       setInvoices(newInvoices);
     };
     invoiceStore.on('change', updateInvoices);
     updateInvoices();
     return () => invoiceStore.off('change', updateInvoices);
-  }, [showLateOnly]);
+  }, [filter, startDate, endDate]);
 
   const handleStatusChange = (id) => (e) => {
     InvoiceActions.updateInvoiceStatus(id, e.target.value);
   };
 
-  const calculateTotal = (items) => items.reduce((sum, item) => sum + (item.rate * item.hours), 0);
+  const calculateTotal = (items) => items.reduce((sum, item) => sum + (item.rate * (item.quantity || item.hours)), 0);
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -34,10 +44,30 @@ const InvoiceList = () => {
   return (
     <div className="invoice-list">
       <h2>Invoices</h2>
-      <label className="filter-checkbox">
-        <input type="checkbox" checked={showLateOnly} onChange={(e) => setShowLateOnly(e.target.checked)} />
-        Show Late Invoices Only
-      </label>
+      <div className="filter-controls">
+        <label className="filter-label">
+          Filter:
+          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <option value="all">All Invoices</option>
+            <option value="paid">Paid</option>
+            <option value="outstanding">Outstanding</option>
+            <option value="late">Late</option>
+            <option value="date">By Date Range</option>
+          </select>
+        </label>
+        {filter === 'date' && (
+          <div className="date-range">
+            <label>
+              Start Date:
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            </label>
+            <label>
+              End Date:
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+            </label>
+          </div>
+        )}
+      </div>
       {invoices.length === 0 ? (
         <p className="no-invoices">No invoices to display</p>
       ) : (
@@ -57,7 +87,10 @@ const InvoiceList = () => {
                   <strong>Items:</strong>
                   <ul>
                     {invoice.items.map((item, idx) => (
-                      <li key={idx}>{item.description} - ${item.rate.toFixed(2)} × {item.hours} = ${(item.rate * item.hours).toFixed(2)}</li>
+                      <li key={idx}>
+                        {item.description} ({item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'N/A'}) - 
+                        ${item.rate.toFixed(2)} × {(item.quantity || item.hours)} = ${(item.rate * (item.quantity || item.hours)).toFixed(2)}
+                      </li>
                     ))}
                   </ul>
                 </div>
