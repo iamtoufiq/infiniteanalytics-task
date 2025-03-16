@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import InvoiceForm from "./components/InvoiceForm";
+import AppHeader from "./components/AppHeader";
 import InvoiceList from "./components/InvoiceList";
+import Modal from "./components/Modal";
+import InvoiceForm from "./components/InvoiceForm";
 import "./styles.css";
-import { RiCloseCircleFill } from "react-icons/ri";
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -10,32 +11,18 @@ const App = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) closeModal();
-  };
-
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>Invoicing App</h1>
-        <button className="create-invoice-btn" onClick={openModal}>
-          Create Invoice
-        </button>
-      </header>
+      <AppHeader onCreateInvoice={openModal} />
       <main className="app-container">
         <section className="invoice-list-section">
           <InvoiceList />
         </section>
       </main>
       {isModalOpen && (
-        <div className="modal-overlay" onClick={handleOverlayClick}>
-          <div className="modal-content">
-            <button className="modal-close-btn" onClick={closeModal}>
-              <RiCloseCircleFill size={24} color="red" />
-            </button>
-            <InvoiceForm closeModal={closeModal} />
-          </div>
-        </div>
+        <Modal onClose={closeModal}>
+          <InvoiceForm closeModal={closeModal} />
+        </Modal>
       )}
     </div>
   );
