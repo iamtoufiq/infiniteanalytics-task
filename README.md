@@ -18,7 +18,6 @@ A simple React-based invoicing application built to manage invoices efficiently.
 - **State Management**: Custom store with EventEmitter
 - **PDF Generation**: jsPDF
 - **Styling**: CSS (with class-based styling)
-- **Testing**: Jest and React Testing Library (optional, not implemented in this version)
 - **Build Tool**: Create React App
 
 ## Prerequisites
