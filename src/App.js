@@ -4,6 +4,7 @@ import InvoiceList from "./components/InvoiceList";
 import Modal from "./components/Modal";
 import InvoiceForm from "./components/InvoiceForm";
 import "./styles.css";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,6 +14,7 @@ const App = () => {
 
   return (
     <div className="app">
+      <Toaster />
       <AppHeader onCreateInvoice={openModal} />
       <main className="app-container">
         <section className="invoice-list-section">

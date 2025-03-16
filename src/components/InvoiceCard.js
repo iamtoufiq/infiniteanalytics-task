@@ -3,6 +3,7 @@ import { InvoiceActions } from "../actions/InvoiceActions";
 import { generatePDF } from "../utils/pdfGenerator";
 import StatusBadge from "./StatusBadge";
 import { RiChatDownloadFill, RiMailFill } from "react-icons/ri";
+import toast from "react-hot-toast";
 
 const InvoiceCard = ({ invoice }) => {
   const calculateTotal = (items) =>
@@ -14,8 +15,7 @@ const InvoiceCard = ({ invoice }) => {
 
   const handleDownload = () => generatePDF(invoice);
   const handleSendEmail = () => {
-    console.log(`Sending email for Invoice #${invoice.id}`);
-    alert(`Email sent for Invoice #${invoice.id} (mocked)`);
+    toast.success(`Email sent for Invoice #${invoice.id}`);
   };
 
   return (

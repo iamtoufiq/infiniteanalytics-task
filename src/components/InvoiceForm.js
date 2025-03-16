@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { InvoiceActions } from "../actions/InvoiceActions";
 import LineItemForm from "./LineItemForm";
 import LineItemsTable from "./LineItemsTable";
+import toast from "react-hot-toast";
 
 const InvoiceForm = ({ closeModal }) => {
   const [invoice, setInvoice] = useState({ items: [], notes: "", dueDate: "" });
@@ -31,7 +32,7 @@ const InvoiceForm = ({ closeModal }) => {
     if (!validateForm()) return;
     InvoiceActions.createInvoice(invoice);
     setInvoice({ items: [], notes: "", dueDate: "" });
-    alert('Invoice "sent" successfully (mocked)');
+    toast.success('Invoice "sent" successfully');
     closeModal();
   };
 

@@ -1,4 +1,5 @@
 import React from "react";
+import toast from "react-hot-toast";
 
 const InvoiceFilter = ({
   filter,
@@ -11,7 +12,7 @@ const InvoiceFilter = ({
   const handleEndDateChange = (e) => {
     const newEndDate = e.target.value;
     if (startDate && newEndDate && new Date(newEndDate) < new Date(startDate)) {
-      alert("End Date cannot be earlier than Start Date");
+      toast.error("End Date cannot be earlier than Start Date");
       setEndDate(startDate);
     } else {
       setEndDate(newEndDate);
